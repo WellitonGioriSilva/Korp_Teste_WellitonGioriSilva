@@ -2,8 +2,12 @@ using faturamento_api.DataContext;
 using faturamento_api.Profiles;
 using faturamento_api.Services;
 using Microsoft.EntityFrameworkCore;
+using faturamento_api.RabbitMq;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton<BaixaEstoquePublisher>();
+builder.Services.AddHostedService<BaixaEstoqueResultadoConsumer>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
@@ -17,6 +21,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<NotaFiscalService>();
+builder.Services.AddHttpClient<EstoqueApiService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["EstoqueApi:BaseUrl"]!);
+});
 builder.Services.AddAutoMapper(config => config.AddProfile<NotaFiscalProfile>());
 
 var app = builder.Build();

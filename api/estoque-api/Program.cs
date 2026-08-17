@@ -2,8 +2,12 @@ using estoque_api.DataContext;
 using estoque_api.Profiles;
 using estoque_api.Services;
 using Microsoft.EntityFrameworkCore;
+using estoque_api.RabbitMq;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton<BaixaEstoqueResultadoPublisher>();
+builder.Services.AddHostedService<BaixaEstoqueSolicitadaConsumer>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
@@ -17,6 +21,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ProdutoService>();
+builder.Services.AddScoped<EventoProcessadoService>();
 builder.Services.AddAutoMapper(config => config.AddProfile<ProdutoProfile>());
 
 var app = builder.Build();

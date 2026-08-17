@@ -15,5 +15,16 @@ namespace faturamento_api.DataContext
 
         public DbSet<NotaFiscal> NotasFiscais { get; set; }
         public DbSet<ItemNotaFiscal> ItensNotasFiscais { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<NotaFiscal>()
+                .Property(notaFiscal => notaFiscal.Numero)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<NotaFiscal>()
+                .HasIndex(notaFiscal => notaFiscal.Numero)
+                .IsUnique();
+        }
     }
 }

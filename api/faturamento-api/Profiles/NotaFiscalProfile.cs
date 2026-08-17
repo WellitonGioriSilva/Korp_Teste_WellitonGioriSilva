@@ -12,7 +12,10 @@ namespace faturamento_api.Profiles
     {
         public NotaFiscalProfile()
         {
-            CreateMap<NotaFiscalCreateDTO, NotaFiscal>();
+            CreateMap<ItemNotaFiscalCreateDTO, ItemNotaFiscal>();
+            CreateMap<NotaFiscalCreateDTO, NotaFiscal>()
+                .ForMember(dest => dest.Numero, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.Ignore());
         }
     }
 }

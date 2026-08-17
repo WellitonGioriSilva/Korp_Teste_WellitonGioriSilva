@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using estoque_api.Exceptions;
 using faturamento_api.DTOs;
 using faturamento_api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace faturamento_api.Controllers
 {
@@ -15,11 +9,12 @@ namespace faturamento_api.Controllers
     public class NotaFiscalController : Controller
     {
         private readonly NotaFiscalService _notaFiscalService;
+
         public NotaFiscalController(NotaFiscalService notaFiscalService)
         {
             _notaFiscalService = notaFiscalService;
         }
- 
+
         [HttpGet("{id}")]
         public async Task<IActionResult> FindOne(int id)
         {
@@ -38,7 +33,7 @@ namespace faturamento_api.Controllers
             catch (ErrorServiceException ex)
             {
                 return ex.ToActionResult(this);
-            }    
+            }
         }
 
         [HttpGet]
@@ -47,6 +42,7 @@ namespace faturamento_api.Controllers
             try
             {
                 var notasFiscais = await _notaFiscalService.FindAll();
+
                 return Ok(new
                 {
                     error = false,
@@ -67,10 +63,13 @@ namespace faturamento_api.Controllers
             try
             {
                 var result = await _notaFiscalService.Create(notaFiscal);
-                return Ok(new {
+
+                return Ok(new
+                {
                     error = false,
-                    message = $"Nota fiscal {result.Id} criada com sucesso.",
-                    code = 201
+                    message = $"Nota fiscal {result.Numero} criada com sucesso.",
+                    code = 201,
+                    data = result
                 });
             }
             catch (ErrorServiceException ex)
@@ -79,6 +78,25 @@ namespace faturamento_api.Controllers
             }
         }
 
-        // Considerar cancelar nota fiscal, mas não deletar, apenas marcar como cancelada.
+        [HttpPost("{id}/impressao")]
+        public async Task<IActionResult> ImpressaoNotaFiscal(int id)
+        {
+            try
+            {
+                var result = await _notaFiscalService.ImpressaoNotaFiscal(id);
+
+                return Ok(new
+                {
+                    error = false,
+                    message = $"Solicitação de baixa de estoque enviada para a nota fiscal {result.Numero}.",
+                    code = 200,
+                    data = result
+                });
+            }
+            catch (ErrorServiceException ex)
+            {
+                return ex.ToActionResult(this);
+            }
+        }
     }
 }

@@ -1,8 +1,8 @@
 services:
   estoque-api:
     build:
-      context: ./api/estoque-api
-      dockerfile: Dockerfile
+      context: ./api
+      dockerfile: estoque-api/Dockerfile
     container_name: estoque-api
     restart: unless-stopped
     ports:
@@ -14,11 +14,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_started
 
   faturamento-api:
     build:
-      context: ./api/faturamento-api
-      dockerfile: Dockerfile
+      context: ./api
+      dockerfile: faturamento-api/Dockerfile
     container_name: faturamento-api
     restart: unless-stopped
     ports:
@@ -27,9 +29,14 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=faturamento_db;Username=postgres;Password=postgres"
+      EstoqueApi__BaseUrl: "http://estoque-api:8080/"
     depends_on:
       postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      estoque-api:
+        condition: service_started
 
   postgres:
     image: postgres:17

@@ -2,3 +2,5 @@
 /api/faturamento-api/obj
 /api/estoque-api/bin
 /api/estoque-api/obj
+/api/Shared/Contracts/bin
+/api/Shared/Contracts/obj

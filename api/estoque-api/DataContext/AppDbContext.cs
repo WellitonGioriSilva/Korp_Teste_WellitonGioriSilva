@@ -14,5 +14,14 @@ namespace estoque_api.DataContext
         }
 
         public DbSet<Produto> Produtos { get; set; }
+        public DbSet<EventoProcessado> EventosProcessados {get; set;}
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<EventoProcessado>()
+                .HasKey(e => new { e.EventoId, e.EventoType });
+        }
     }
 }

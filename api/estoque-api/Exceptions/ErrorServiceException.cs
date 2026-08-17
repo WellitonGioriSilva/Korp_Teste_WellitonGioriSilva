@@ -10,7 +10,8 @@ namespace estoque_api.Exceptions
     {
         private readonly Func<ControllerBase, IActionResult> _actionResult;
 
-        public ErrorServiceException(Func<ControllerBase, IActionResult> actionResult)
+        public ErrorServiceException(Func<ControllerBase, IActionResult> actionResult, string message = "Erro no serviço.")
+            : base(message)
         {
             _actionResult = actionResult;
         }   
