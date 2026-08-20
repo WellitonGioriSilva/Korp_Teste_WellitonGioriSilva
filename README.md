@@ -4,6 +4,22 @@ Aplicação full stack desenvolvida para o teste técnico da Korp. O sistema per
 
 O projeto foi estruturado com frontend em Angular, backend em C#/.NET e arquitetura de microsserviços, utilizando PostgreSQL para persistência e RabbitMQ para comunicação assíncrona entre os serviços.
 
+## Stack e Workflow Utilizado
+
+### Stack principal
+
+- **Frontend:** Angular, Angular Router, Reactive Forms, RxJS, Tailwind CSS e Flowbite.
+- **Backend:** C#/.NET, ASP.NET Core Web API, Entity Framework Core, AutoMapper e Swagger.
+- **Banco e mensageria:** PostgreSQL e RabbitMQ.
+- **Arquitetura:** microsserviços com comunicação síncrona para validações e mensageria para baixa assíncrona de estoque.
+
+### Workflow de desenvolvimento
+
+- **Codex:** utilizado como assistente de engenharia para apoiar leitura do código, implementação, revisão e documentação.
+- **Subagentes:** usados para dividir investigações e tarefas pontuais entre backend, frontend, documentação e validações.
+- **MCP (Model Context Protocol):** considerado para conectar ferramentas e fontes de contexto ao ambiente de desenvolvimento.
+- **Fluxo iterativo:** análise do código existente, mudanças incrementais, revisão técnica e validação do comportamento implementado.
+
 ## Visão Geral da Solução
 
 A solução é composta por:
