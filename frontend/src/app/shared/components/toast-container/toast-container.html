@@ -1,0 +1,41 @@
+<div class="fixed right-5 top-5 z-[60] flex w-full max-w-xs flex-col gap-3">
+  @for (toast of toasts$ | async; track toast.id) {
+    <div
+      class="flex w-full items-center rounded-lg bg-white p-4 text-gray-500 shadow"
+      role="alert"
+    >
+      <div
+        class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+        [class.bg-green-100]="toast.type === 'success'"
+        [class.text-green-500]="toast.type === 'success'"
+        [class.bg-red-100]="toast.type === 'error'"
+        [class.text-red-500]="toast.type === 'error'"
+      >
+        @if (toast.type === 'success') {
+          <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.7 8.2-4 4a1 1 0 0 1-1.4 0l-2-2a1 1 0 1 1 1.4-1.4L9 10.6l3.3-3.3a1 1 0 1 1 1.4 1.4Z"/>
+          </svg>
+        } @else {
+          <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.5 12a1 1 0 0 1-1.4 1.4L10 11.4l-2.1 2.1a1 1 0 0 1-1.4-1.4L8.6 10 6.5 7.9a1 1 0 0 1 1.4-1.4L10 8.6l2.1-2.1a1 1 0 0 1 1.4 1.4L11.4 10l2.1 2.1Z"/>
+          </svg>
+        }
+      </div>
+
+      <div class="ms-3 text-sm font-normal">
+        {{ toast.message }}
+      </div>
+
+      <button
+        type="button"
+        (click)="toastService.remove(toast.id)"
+        class="-mx-1.5 -my-1.5 ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900 focus:ring-2 focus:ring-gray-300"
+        aria-label="Fechar"
+      >
+        <svg class="h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 12 12M13 1 1 13"/>
+        </svg>
+      </button>
+    </div>
+  }
+</div>

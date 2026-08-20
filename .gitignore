@@ -1,6 +1,6 @@
-/api/faturamento-api/bin
-/api/faturamento-api/obj
-/api/estoque-api/bin
-/api/estoque-api/obj
-/api/Shared/Contracts/bin
-/api/Shared/Contracts/obj
+/backend/faturamento-api/bin
+/backend/faturamento-api/obj
+/backend/estoque-api/bin
+/backend/estoque-api/obj
+/backend/Shared/Contracts/bin
+/backend/Shared/Contracts/obj

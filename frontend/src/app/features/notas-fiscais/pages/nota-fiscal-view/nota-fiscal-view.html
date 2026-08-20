@@ -1,0 +1,149 @@
+<section>
+  @if (imprimindo$ | async) {
+    <div class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-white/75 backdrop-blur-[1px]">
+      <div
+        class="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"
+        aria-label="Imprimindo nota fiscal"
+      ></div>
+      @if (imprimindoNotaNumero$ | async; as numero) {
+        <p class="text-sm font-medium text-gray-700">
+          Processando Nota {{ numero }}
+        </p>
+      }
+    </div>
+  }
+
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">
+        Visualizar nota fiscal
+      </h2>
+
+      <p class="mt-1 text-sm text-gray-500">
+        Consulte os dados, itens e status da nota fiscal.
+      </p>
+    </div>
+
+    <a
+      routerLink="/notas-fiscais"
+      class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100"
+    >
+      Voltar
+    </a>
+  </div>
+
+  @if (carregando$ | async) {
+    <div class="rounded-lg border border-gray-200 bg-white p-10 shadow-sm">
+      <div class="flex items-center justify-center">
+        <div
+          class="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"
+        ></div>
+      </div>
+    </div>
+  } @else if (notaFiscal$ | async; as notaFiscal) {
+    <div class="rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div class="flex flex-col gap-4 border-b border-gray-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Nota fiscal {{ notaFiscal.numero }}
+          </h3>
+          <p class="mt-1 text-sm text-gray-500">
+            Emitida em {{ notaFiscal.dataEmissao | date: 'dd/MM/yyyy HH:mm' }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="imprimirNotaFiscal(notaFiscal)"
+          [disabled]="notaFiscal.status !== 'Aberta' || (imprimindo$ | async)"
+          class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-4 focus:ring-blue-300"
+        >
+          <svg class="me-2 h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M16.5 16.5h1.125A2.625 2.625 0 0 0 20.25 13.875v-3.75A2.625 2.625 0 0 0 17.625 7.5H6.375A2.625 2.625 0 0 0 3.75 10.125v3.75A2.625 2.625 0 0 0 6.375 16.5H7.5"/>
+            <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M7.5 7.5V3.75h9V7.5M7.5 14.25h9v6h-9v-6Z"/>
+          </svg>
+          Imprimir nota
+        </button>
+      </div>
+
+      <dl class="grid gap-6 border-b border-gray-200 p-6 sm:grid-cols-3">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">
+            Status
+          </dt>
+          <dd class="mt-1">
+            <span
+              class="rounded-full px-2.5 py-0.5 text-xs font-medium"
+              [ngClass]="getStatusClasses(notaFiscal.status)"
+            >
+              {{ notaFiscal.status }}
+            </span>
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-medium text-gray-500">
+            Total de itens
+          </dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            {{ notaFiscal.itens.length }}
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-medium text-gray-500">
+            Total
+          </dt>
+          <dd class="mt-1 text-sm font-semibold text-gray-900">
+            R$ {{ calcularTotal(notaFiscal) | number: '1.2-2' }}
+          </dd>
+        </div>
+      </dl>
+
+      @if (notaFiscal.observacao) {
+        <div class="border-b border-gray-200 px-6 py-4 text-sm text-gray-600">
+          {{ notaFiscal.observacao }}
+        </div>
+      }
+
+      <div class="relative overflow-x-auto">
+        <table class="w-full text-left text-sm text-gray-500">
+          <thead class="bg-gray-50 text-xs uppercase text-gray-700">
+            <tr>
+              <th scope="col" class="px-6 py-3">
+                Produto
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Quantidade
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Valor unitário
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Total
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of notaFiscal.itens; track item.id) {
+              <tr class="border-b border-gray-200 bg-white">
+                <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
+                  {{ item.descricaoProduto }}
+                </th>
+                <td class="px-6 py-4">
+                  {{ item.quantidade }}
+                </td>
+                <td class="px-6 py-4">
+                  R$ {{ item.valorUnitario | number: '1.2-2' }}
+                </td>
+                <td class="px-6 py-4">
+                  R$ {{ item.valorTotal | number: '1.2-2' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</section>

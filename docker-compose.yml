@@ -1,7 +1,7 @@
 services:
   estoque-api:
     build:
-      context: ./api
+      context: ./backend
       dockerfile: estoque-api/Dockerfile
     container_name: estoque-api
     restart: unless-stopped
@@ -19,7 +19,7 @@ services:
 
   faturamento-api:
     build:
-      context: ./api
+      context: ./backend
       dockerfile: faturamento-api/Dockerfile
     container_name: faturamento-api
     restart: unless-stopped
@@ -37,6 +37,22 @@ services:
         condition: service_started
       estoque-api:
         condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm start -- --host 0.0.0.0"
+    depends_on:
+      - faturamento-api
+      - estoque-api
 
   postgres:
     image: postgres:17

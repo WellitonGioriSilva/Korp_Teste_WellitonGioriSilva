@@ -1,0 +1,100 @@
+<section class="min-h-screen w-full">
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-900">
+      {{ (modoEdicao$ | async) ? 'Editar produto' : 'Novo produto' }}
+    </h2>
+
+    <p class="mt-1 text-sm text-gray-500">
+      Informe os dados do produto para manter o estoque atualizado.
+    </p>
+  </div>
+
+  @if (carregando$ | async) {
+    <div class="rounded-lg border border-gray-200 bg-white p-10 shadow-sm">
+      <div class="flex items-center justify-center">
+        <div
+          class="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"
+        ></div>
+      </div>
+    </div>
+  } @else {
+    <form
+      [formGroup]="form"
+      (ngSubmit)="salvar()"
+      class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
+    >
+      <div class="mb-5">
+        <label
+          for="descricao"
+          class="mb-2 block text-sm font-medium text-gray-900"
+        >
+          Descricao
+        </label>
+        <input
+          id="descricao"
+          type="text"
+          formControlName="descricao"
+          maxlength="100"
+          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+        />
+
+        @if (form.controls.descricao.touched && form.controls.descricao.hasError('required')) {
+          <p class="mt-2 text-sm text-red-600">
+            A descricao e obrigatoria.
+          </p>
+        }
+
+        @if (form.controls.descricao.touched && form.controls.descricao.hasError('maxlength')) {
+          <p class="mt-2 text-sm text-red-600">
+            A descricao deve ter no maximo 100 caracteres.
+          </p>
+        }
+      </div>
+
+      <div class="mb-6">
+        <label
+          for="saldo"
+          class="mb-2 block text-sm font-medium text-gray-900"
+        >
+          Saldo
+        </label>
+        <input
+          id="saldo"
+          type="number"
+          formControlName="saldo"
+          min="0"
+          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+        />
+
+        @if (form.controls.saldo.touched && form.controls.saldo.hasError('required')) {
+          <p class="mt-2 text-sm text-red-600">
+            O saldo e obrigatório.
+          </p>
+        }
+
+        @if (form.controls.saldo.touched && form.controls.saldo.hasError('min')) {
+          <p class="mt-2 text-sm text-red-600">
+            O saldo nao pode ser negativo.
+          </p>
+        }
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button
+          type="submit"
+          [disabled]="(salvando$ | async) ?? false"
+          class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {{ (salvando$ | async) ? 'Salvando...' : 'Salvar' }}
+        </button>
+
+        <a
+          routerLink="/produtos"
+          class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100"
+        >
+          Cancelar
+        </a>
+      </div>
+    </form>
+  }
+</section>

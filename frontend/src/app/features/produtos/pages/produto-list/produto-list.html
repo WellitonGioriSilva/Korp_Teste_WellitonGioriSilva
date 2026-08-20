@@ -1,0 +1,91 @@
+<section>
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">
+        Produtos
+      </h2>
+
+      <p class="mt-1 text-sm text-gray-500">
+        Gerencie os produtos disponiveis no estoque.
+      </p>
+    </div>
+
+    <a
+      routerLink="/produtos/novo"
+      class="rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
+    >
+      Novo produto
+    </a>
+  </div>
+
+  <div class="mb-4">
+    <label
+      for="busca-produto"
+      class="mb-2 block text-sm font-medium text-gray-900"
+    >
+      Buscar por nome
+    </label>
+
+    <input
+      id="busca-produto"
+      type="search"
+      [formControl]="buscaControl"
+      placeholder="Digite o nome do produto"
+      class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+    />
+  </div>
+
+  <div class="relative overflow-x-auto rounded-lg border border-gray-200 shadow-md">
+    @if (carregando$ | async) {
+      <div class="flex items-center justify-center bg-white p-10">
+        <div
+          class="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"
+        ></div>
+      </div>
+    } @else {
+      @if (produtos$ | async; as produtos) {
+        <table class="w-full text-left text-sm text-gray-500">
+          <thead class="bg-gray-50 text-xs uppercase text-gray-700">
+            <tr>
+              <th scope="col" class="px-6 py-3">
+                Descrição
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Saldo
+              </th>
+              <th scope="col" class="px-6 py-3 text-right">
+                Ações
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (produto of produtos; track produto.id) {
+              <tr class="border-b border-gray-200 bg-white hover:bg-gray-50">
+                <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
+                  {{ produto.descricao }}
+                </th>
+                <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
+                  {{ produto.saldo }} unidades
+                </th>
+                <td class="px-6 py-4">
+                  <app-produto-actions
+                    [produto]="produto"
+                  />
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td
+                  colspan="3"
+                  class="bg-white px-6 py-12 text-center text-sm text-gray-500"
+                >
+                  Nenhum produto encontrado.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  </div>
+</section>

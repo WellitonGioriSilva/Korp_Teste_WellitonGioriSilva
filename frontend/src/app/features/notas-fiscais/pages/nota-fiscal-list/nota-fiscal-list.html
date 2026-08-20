@@ -1,0 +1,193 @@
+<section>
+  @if (imprimindoNotaId$ | async) {
+    <div class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-white/75 backdrop-blur-[1px]">
+      <div
+        class="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"
+        aria-label="Imprimindo nota fiscal"
+      ></div>
+      @if (imprimindoNotaNumero$ | async; as numero) {
+        <p class="text-sm font-medium text-gray-700">
+          Processando Nota {{ numero }}
+        </p>
+      }
+    </div>
+  }
+
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">
+        Notas fiscais
+      </h2>
+
+      <p class="mt-1 text-sm text-gray-500">
+        Acompanhe as notas emitidas e solicite a impressão.
+      </p>
+    </div>
+
+    <a
+      routerLink="/notas-fiscais/nova"
+      class="rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
+    >
+      Nova nota fiscal
+    </a>
+  </div>
+
+  <div class="mb-4">
+    <label
+      for="busca-nota-fiscal"
+      class="mb-2 block text-sm font-medium text-gray-900"
+    >
+      Buscar nota fiscal
+    </label>
+
+    <input
+      id="busca-nota-fiscal"
+      type="search"
+      [formControl]="buscaControl"
+      placeholder="Digite numero ou status"
+      class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+    />
+  </div>
+
+  <div class="relative overflow-x-auto rounded-lg border border-gray-200 shadow-md">
+    @if (carregando$ | async) {
+      <div class="flex items-center justify-center bg-white p-10">
+        <div
+          class="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"
+        ></div>
+      </div>
+    } @else {
+      @if (notasFiscais$ | async; as notasFiscais) {
+        <table class="w-full text-left text-sm text-gray-500">
+          <thead class="bg-gray-50 text-xs uppercase text-gray-700">
+            <tr>
+              <th scope="col" class="px-6 py-3">
+                Número
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Emissão
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Status
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Total
+              </th>
+              <th scope="col" class="px-6 py-3 text-right">
+                Ações
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (notaFiscal of notasFiscais; track notaFiscal.id) {
+              <tr class="border-b border-gray-200 bg-white hover:bg-gray-50">
+                <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
+                  {{ notaFiscal.numero }}
+                </th>
+                <td class="px-6 py-4">
+                  {{ notaFiscal.dataEmissao | date: 'dd/MM/yyyy HH:mm' }}
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="rounded-full px-2.5 py-0.5 text-xs font-medium"
+                    [ngClass]="getStatusClasses(notaFiscal.status)"
+                  >
+                    {{ notaFiscal.status }}
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  R$ {{ calcularTotal(notaFiscal) | number: '1.2-2' }}
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex justify-end gap-2">
+                    <a
+                      [routerLink]="['/notas-fiscais', notaFiscal.id]"
+                      class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100"
+                      aria-label="Visualizar nota fiscal"
+                      title="Visualizar nota fiscal"
+                    >
+                      <svg class="h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z"/>
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                      </svg>
+                    </a>
+
+                    <button
+                      type="button"
+                      (click)="imprimirNotaFiscal(notaFiscal)"
+                      [disabled]="
+                        notaFiscal.status !== 'Aberta' ||
+                        (imprimindoNotaId$ | async) !== null
+                      "
+                      class="
+                        inline-flex h-9 items-center justify-center gap-2
+                        rounded-lg border border-gray-200 bg-white px-3
+                        text-sm font-medium text-gray-900
+                        hover:bg-gray-100 hover:text-blue-700
+                        disabled:cursor-not-allowed disabled:opacity-50
+                        focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100
+                      "
+                      aria-label="Imprimir nota fiscal"
+                      title="Imprimir nota fiscal"
+                    >
+                      @if (
+                        (imprimindoNotaId$ | async) === notaFiscal.id
+                      ) {
+
+                        <div
+                          class="
+                            h-4 w-4 animate-spin rounded-full
+                            border-2 border-gray-300
+                            border-t-blue-600
+                          "
+                        ></div>
+
+                        <span>
+                          Processando...
+                        </span>
+
+                      } @else {
+
+                        <svg
+                          class="h-4 w-4"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke="currentColor"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M16.5 16.5h1.125A2.625 2.625 0 0 0 20.25 13.875v-3.75A2.625 2.625 0 0 0 17.625 7.5H6.375A2.625 2.625 0 0 0 3.75 10.125v3.75A2.625 2.625 0 0 0 6.375 16.5H7.5"
+                          />
+
+                          <path
+                            stroke="currentColor"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M7.5 7.5V3.75h9V7.5M7.5 14.25h9v6h-9v-6Z"
+                          />
+                        </svg>
+
+                      }
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td
+                  colspan="5"
+                  class="bg-white px-6 py-12 text-center text-sm text-gray-500"
+                >
+                  Nenhuma nota fiscal encontrada.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  </div>
+</section>
