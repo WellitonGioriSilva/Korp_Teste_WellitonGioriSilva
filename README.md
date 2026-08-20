@@ -270,14 +270,3 @@ docker compose down -v
 ├── frontend
 └── docker-compose.yml
 ```
-
-## Observações Técnicas
-
-- O projeto usa CORS liberado para `http://localhost:4200`.
-- As APIs executam migrations automaticamente ao iniciar.
-- A comunicação de resultado da impressão para o navegador usa Server-Sent Events.
-- A comunicação entre microsserviços para baixa de estoque usa RabbitMQ com exchange direct e mensagens persistentes.
-- O frontend impede a impressão de notas com status diferente de `Aberta`.
-- O backend também valida o status antes de solicitar a impressão.
-- A baixa de estoque é feita dentro de transação no serviço de estoque.
-- A implementação atual não possui funcionalidade de inteligência artificial, pois esse item era opcional no teste.
